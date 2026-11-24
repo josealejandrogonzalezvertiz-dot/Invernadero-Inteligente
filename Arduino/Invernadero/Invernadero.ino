@@ -1,36 +1,54 @@
 
-// Proyecto: Invernadero Inteligente
-// Sistema de temperatura y riego automatico
+/*
+  Proyecto: Invernadero Inteligente
+  Sistema de ventilacion y riego automatico
+  Integracion de modulos y comunicacion con Python
+*/
 
 #include <Arduino.h>
+#include "Temperatura.h"
+#include "Riego.h"
 
-// Pines de los sensores
-const int PIN_TEMPERATURA = 2;
-const int PIN_HUMEDAD = A0;
-
-// Pines de los actuadores
-const int PIN_VENTILADOR = 7;
-const int PIN_BOMBA = 8;
-
-// Limites de temperatura
-const float TEMP_MAXIMA = 30.0;
-const float TEMP_MINIMA = 28.0;
-
-// Limites de humedad del suelo
-const int HUMEDAD_MINIMA = 40;
-const int HUMEDAD_MAXIMA = 60;
+// Variables de monitoreo
+float temperatura = 0.0;
+int humedad = 0;
 
 void setup() {
+  // Comunicacion con Python
   Serial.begin(9600);
 
-  Serial.println("Invernadero Inteligente");
-  Serial.println("Iniciando sistema...");
+  // Inicializacion de los modulos
+  iniciarTemperatura();
+  iniciarRiego();
+
+  delay(2000);
 }
 
 void loop() {
-  // Modulo de temperatura y ventilacion
 
-  // Modulo de humedad y riego
+  // Lectura de sensores
+  temperatura = leerTemperatura();
+  humedad = leerHumedad();
 
+  // Control automatico
+  controlarVentilador(temperatura);
+  controlarBomba(humedad);
+
+  // Envio de temperatura
+  Serial.print(temperatura, 1);
+  Serial.print(",");
+
+  // Envio de humedad
+  Serial.print(humedad);
+  Serial.print(",");
+
+  // Estado del ventilador
+  Serial.print(ventiladorActivo ? 1 : 0);
+  Serial.print(",");
+
+  // Estado de la bomba
+  Serial.println(bombaActiva ? 1 : 0);
+
+  // Actualizacion cada dos segundos
   delay(2000);
 }
